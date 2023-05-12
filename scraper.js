@@ -40,4 +40,32 @@ async function scrapePlayerInfo(fide_id) {
   }
 }
 
-module.exports = { scrapePlayerInfo };
+async function getPlayerEloList(fide_id) {
+  const url = `https://ratings.fide.com/profile/${fide_id}/chart`;
+
+  try {
+    const { data } = await axios.get(url);
+    const $ = cheerio.load(data);
+
+    let res = [];
+
+    $(".profile-table_chart-table tbody tr").each((index, element) => {
+      let period = $(element).find("td").eq(0).text().trim();
+      let classical = $(element).find("td").eq(1).text().trim();
+      let rapid = $(element).find("td").eq(3).text().trim();
+      let blitz = $(element).find("td").eq(5).text().trim();
+
+      res.push({
+        period,
+        classical,
+        rapid,
+        blitz,
+      });
+    });
+    return res;
+  } catch (error) {
+    console.error(`Failed to scrape data from ${url}: `, error);
+  }
+  
+}
+module.exports = { scrapePlayerInfo, getPlayerEloList };

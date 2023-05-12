@@ -1,7 +1,8 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 
-const { scrapePlayerInfo } = require("./scraper");
+const { scrapePlayerInfo, getPlayerEloList } = require("./scraper");
+const { convertToDate } = require("./convertToDate");
 
 const prisma = new PrismaClient();
 const app = express();
@@ -28,8 +29,6 @@ app.post("/players", async (req, res) => {
 
   const playerInfo = await scrapePlayerInfo(fideId);
 
-  console.log(playerInfo);
-
   try {
     const player = await prisma.player.create({
       data: {
@@ -55,6 +54,19 @@ app.post("/players", async (req, res) => {
         .json({ error: "An error occurred while creating the player" });
     }
   }
+  const eloInfo = await getPlayerEloList(fideId);
+
+
+  console.log(eloInfo);
+
+    // create elo records
+    // eloInfo.forEach(eloRecord => {
+    //     await prisma.
+        
+    // });
+
+
+
 });
 
 app.listen(3000, () => console.log("Server is running on port 3000"));
