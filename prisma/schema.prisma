@@ -7,8 +7,61 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
+model Player {
+  fideId    Int    @id
+  firstName String
+  lastName  String
+
+  sex String
+
+  birthYear  Int
+  federation String
+
+  elos        Elo[]
+  tournaments Tournament[]
+
+  @@map("players")
+}
+
+model Elo {
+  id Int @id @default(autoincrement())
+
+  classical Int?
+  rapid    Int?
+  blitz    Int?
+
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [fideId])
+
+  date DateTime
+
+  @@map("elos")
+}
+model Tournament {
+  id Int @id @default(autoincrement())
+
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [fideId])
+
+  timeControl String // "classical", "rapid", "blitz"
+
+  name String
+  date DateTime
+
+  @@map("tournaments")
+}
+model Game {
+  id Int @id @default(autoincrement())
+
+  color String // "w" or "b"
+  
+  OpponentName String
+  OpponentElo Int
+  
+
+  Result Float // 1 = win, 0.5 = draw, 0 = loss 
+
+  change Float // elo variation
+
+  @@map("games")
 }
