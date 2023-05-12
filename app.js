@@ -1,20 +1,60 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const express = require("express");
+const { PrismaClient } = require("@prisma/client");
+
+const { scrapePlayerInfo } = require("./scraper");
 
 const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
 
-app.get('/users', async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
+app.get("/players", async (req, res) => {
+  const players = await prisma.player.findMany();
+  res.json(players);
 });
 
-app.post('/users', async (req, res) => {
-  const { name, email } = req.body;
-  const user = await prisma.user.create({ data: { name, email } });
-  res.json(user);
+app.get("/players/:id", async (req, res) => {
+  const { id } = req.params;
+  const player = await prisma.player.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
+  res.json(player);
 });
 
-app.listen(3000, () => console.log('Server is running on port 3000'));
+app.post("/players", async (req, res) => {
+  const { fideId } = req.body;
+
+  const playerInfo = await scrapePlayerInfo(fideId);
+
+  console.log(playerInfo);
+
+  try {
+    const player = await prisma.player.create({
+      data: {
+        fideId: parseInt(fideId),
+        firstName: playerInfo.firstName,
+        lastName: playerInfo.lastName,
+        federation: playerInfo.federation,
+        birthYear: parseInt(playerInfo.birthYear),
+        sex: playerInfo.sex,
+      },
+    });
+
+    res.status(201).json(player);
+  } catch (error) {
+    if (error.code === "P2002" && error.meta.target.includes("fideId")) {
+      res
+        .status(409)
+        .json({ error: "A player with this FIDE ID already exists" });
+    } else {
+      console.log(error);
+      res
+        .status(500)
+        .json({ error: "An error occurred while creating the player" });
+    }
+  }
+});
+
+app.listen(3000, () => console.log("Server is running on port 3000"));
