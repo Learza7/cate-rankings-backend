@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 
 const { scrapePlayerInfo, getPlayerEloList } = require("./scraper");
@@ -7,12 +8,37 @@ const { convertToDate } = require("./convertToDate");
 const prisma = new PrismaClient();
 const app = express();
 
+app.use(cors());
+
 app.use(express.json());
 
 app.get("/players", async (req, res) => {
-  const players = await prisma.player.findMany();
-  res.json(players);
+  try {
+    const players = await prisma.player.findMany();
+
+    const playersWithLastElo = await Promise.all(players.map(async player => {
+      // Get the latest elo for the player
+      const lastEloData = await prisma.elo.findFirst({
+        where: { playerId: player.fideId },
+        orderBy: { date: 'desc' }
+      });
+
+      // Exclude the original elos from the player object
+      //const { elos, ...playerData } = player;
+
+      const { id, ...lastElo } = lastEloData || {};
+      // Return player data with the latest elo
+      return { ...player, lastElo };
+    }));
+
+    res.json(playersWithLastElo);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred while fetching the players" });
+  }
 });
+
+
 
 app.get("/players/:id", async (req, res) => {
   const { id } = req.params;
