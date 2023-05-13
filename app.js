@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 
-const { scrapePlayerInfo, getPlayerEloList } = require("./scraper");
+const { scrapePlayerInfo, getPlayerEloList, scrapeFideData } = require("./scraper");
 const { convertToDate } = require("./convertToDate");
 
 const prisma = new PrismaClient();
@@ -38,7 +38,11 @@ app.get("/players", async (req, res) => {
   }
 });
 
-
+app.get("/test", async (req, res) => {
+  const data = await scrapeFideData('651097982', '2022-11-01', '0');
+  console.log(data);
+  res.json(data);
+});
 
 app.get("/players/:id", async (req, res) => {
   const { id } = req.params;

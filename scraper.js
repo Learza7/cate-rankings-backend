@@ -68,4 +68,45 @@ async function getPlayerEloList(fide_id) {
   }
   
 }
-module.exports = { scrapePlayerInfo, getPlayerEloList };
+
+const puppeteer = require('puppeteer');
+
+async function scrapeFideData(id, period, rating) {
+    const url = `https://ratings.fide.com/calculations.phtml?id_number=${id}&period=${period}&rating=${rating}`;
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    
+    const tournament = await page.evaluate(() => {
+
+      const tournamentRows = Array.from(document.querySelectorAll('.calc_table tr[bgcolor="#efefef"]'));
+      const tournaments = [];
+      
+      for (let i = 0; i < tournamentRows.length; i++) {
+          let row = tournamentRows[i];
+          if (row.querySelector('td b a')) { // new tournament
+              let tournamentName = row.querySelector('td b a').innerText.trim();
+              tournaments.push({ name: tournamentName, games: [] });
+          } else { // game in current tournament
+              let cells = row.querySelectorAll('td');
+              let opponentName = cells[0].innerText.trim();
+              let opponentElo = cells[3].innerText.trim();
+              let result = cells[5].innerText.trim();
+              let kChange = cells[9].innerText.trim();
+              let game = { opponentName, opponentElo, result, kChange };
+              tournaments[tournaments.length - 1].games.push(game);
+          }
+      }
+      return tournaments;
+      
+    });
+
+    await browser.close();
+
+    return tournament;
+}
+
+
+
+module.exports = { scrapePlayerInfo, getPlayerEloList, scrapeFideData };
