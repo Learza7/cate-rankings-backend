@@ -29,4 +29,4 @@ function convertToDate(dateString) {
     return new Date(newDateString);
   }
 
-    module.exports = convertToDate;
+    module.exports = { convertToDate };

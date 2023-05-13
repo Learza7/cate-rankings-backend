@@ -60,13 +60,51 @@ app.post("/players", async (req, res) => {
   console.log(eloInfo);
 
     // create elo records
-    // eloInfo.forEach(eloRecord => {
-    //     await prisma.
-        
-    // });
+    for (eloElem of eloInfo) {
+      // Convert date to consistent format
+      const eloDate = convertToDate(eloElem.period);
+    
+      // Check if ELO with the same date exists for the player
+      const existingElo = await prisma.elo.findFirst({
+        where: {
+          AND: [
+            { date: eloDate },
+            { player: { fideId: parseInt(fideId) } }
+          ]
+        }
+      });
+    
+      // Only create new ELO if it doesn't exist
+      if (!existingElo) {
+        const elo = await prisma.elo.create({
+          data: {
+            player: {
+              connect: {
+                fideId: parseInt(fideId),
+              },
+            },
+            date: eloDate,
+            classical: parseInt(eloElem.classical) ? parseInt(eloElem.classical) : null,
+            rapid: parseInt(eloElem.rapid) ? parseInt(eloElem.rapid) : null,
+            blitz: parseInt(eloElem.blitz) ? parseInt(eloElem.blitz) : null,
+          },
+        });
+      }
+    }
 
 
 
 });
+
+app.get("/players/:id/elo", async (req, res) => {
+  const { id } = req.params;
+  const elo = await prisma.elo.findMany({
+    where: {
+      playerId: parseInt(id),
+    },
+  });
+  return res.json(elo);
+});
+
 
 app.listen(3000, () => console.log("Server is running on port 3000"));
