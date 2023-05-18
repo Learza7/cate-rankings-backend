@@ -39,8 +39,70 @@ app.get("/players", async (req, res) => {
 });
 
 app.get("/test", async (req, res) => {
-  const data = await scrapeFideData('651097982', '2022-11-01', '0');
-  console.log(data);
+  let id = '651097982';
+  const data = await scrapeFideData(id, 1);
+
+  for (let i = 0; i < 3; i++) {
+    let tournaments = data[i];
+    for (let j = 0; j < tournaments.length; j++) {
+      let tournament = tournaments[j];
+
+      let existingTournament = await prisma.tournament.findFirst({
+        where: {
+          AND: [
+            { name: tournament.title },
+            { player: { fideId: parseInt(id) } },
+            { date: convertToDate("2023-May") }
+          ]
+        }
+      });
+
+      if (!existingTournament) {
+        const newTournament = await prisma.tournament.create({
+          data: {
+            player: {
+              connect: {
+                fideId: parseInt(id),
+              },
+            },
+            name: tournament.title,
+            date: convertToDate("2023-May"),
+            timeControl: i==0 ? 'classical' : i==1 ? 'rapid' : 'blitz',
+          },
+        });
+
+        let games = tournament.games;
+        for (let k = 0; k < games.length; k++) {
+          let game = games[k];
+
+          const newGame = await prisma.game.create({
+            data: {
+              tournament: {
+                connect: {
+                  id: newTournament.id,
+                },
+              },
+              OpponentName: game.opponentName,
+              OpponentElo: parseInt(game.opponentElo),
+              Result: parseFloat(game.result),
+              change: parseFloat(game.kChange),
+              color: game.color,
+            },
+          });
+        }
+
+
+
+      }
+    }
+  }
+
+
+
+
+
+
+
   res.json(data);
 });
 
@@ -122,18 +184,26 @@ app.post("/players", async (req, res) => {
       }
     }
 
+    // récupérer les tournois / games du dernier mois uniquement
+
+    
+
 
 
 });
 
-app.get("/players/:id/elo", async (req, res) => {
+app.get("/players/:id/games", async (req, res) => {
   const { id } = req.params;
-  const elo = await prisma.elo.findMany({
+  const games = await prisma.game.findMany({
     where: {
-      playerId: parseInt(id),
+      tournament: {
+        player: {
+          fideId: parseInt(id),
+        },
+      },
     },
   });
-  return res.json(elo);
+  return res.json(games);
 });
 
 

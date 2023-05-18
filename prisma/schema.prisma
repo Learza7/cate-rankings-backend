@@ -43,6 +43,9 @@ model Tournament {
   playerId Int
   player   Player @relation(fields: [playerId], references: [fideId])
 
+  games Game[]
+
+
   timeControl String // "classical", "rapid", "blitz"
 
   name String
@@ -57,7 +60,10 @@ model Game {
   
   OpponentName String
   OpponentElo Int
-  
+
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])  
+
 
   Result Float // 1 = win, 0.5 = draw, 0 = loss 
 

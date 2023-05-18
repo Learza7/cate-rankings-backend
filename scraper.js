@@ -66,47 +66,97 @@ async function getPlayerEloList(fide_id) {
   } catch (error) {
     console.error(`Failed to scrape data from ${url}: `, error);
   }
-  
 }
 
-const puppeteer = require('puppeteer');
+const puppeteer = require("puppeteer");
 
-async function scrapeFideData(id, period, rating) {
-    const url = `https://ratings.fide.com/calculations.phtml?id_number=${id}&period=${period}&rating=${rating}`;
+async function scrapeFideData(id, period) {
+  const url = `https://ratings.fide.com/profile/${id}/calculations`;
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    
-    const tournament = await page.evaluate(() => {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "networkidle2" });
 
-      const tournamentRows = Array.from(document.querySelectorAll('.calc_table tr[bgcolor="#efefef"]'));
-      const tournaments = [];
-      
-      for (let i = 0; i < tournamentRows.length; i++) {
-          let row = tournamentRows[i];
-          if (row.querySelector('td b a')) { // new tournament
-              let tournamentName = row.querySelector('td b a').innerText.trim();
-              tournaments.push({ name: tournamentName, games: [] });
-          } else { // game in current tournament
-              let cells = row.querySelectorAll('td');
-              let opponentName = cells[0].innerText.trim();
-              let opponentElo = cells[3].innerText.trim();
-              let result = cells[5].innerText.trim();
-              let kChange = cells[9].innerText.trim();
-              let game = { opponentName, opponentElo, result, kChange };
-              tournaments[tournaments.length - 1].games.push(game);
-          }
+  const period_result = await page.evaluate(() => {
+    const periodRow = Array.from(
+      document.querySelectorAll(".profile-table_colors tr")
+    )[2];
+
+    const tds = Array.from(periodRow.querySelectorAll("td"));
+    return tds.map((td) => {
+      const anchor = td.querySelector("a");
+      if (anchor) {
+        return {
+          text: anchor.innerText,
+          href: anchor.href,
+        };
       }
-      return tournaments;
-      
+      return { text: td.innerText }; // If no anchor tag is found
     });
+  });
 
-    await browser.close();
+  let tournaments_result = [[], [], []];
+  // Loop through each returned object and navigate to the link if it exists
+  for (let i = 1; i < period_result.length; i++) {
+    if (period_result[i].href) {
+      await page.goto(period_result[i].href, { waitUntil: "networkidle2" });
+      const tournaments = await page.evaluate(() => {
+        const tournamentRows = Array.from(
+          document.querySelectorAll(".calc_table tr")
+        );
 
-    return tournament;
+        const tournaments = [];
+        let currentTournament = null;
+
+        tournamentRows.forEach((row) => {
+          if (row.innerHTML.includes('<td colspan="4" width="400"><b>')) {
+            if (currentTournament) {
+              tournaments.push(currentTournament);
+            }
+
+            currentTournament = {
+              title: row.innerText.trim().split("\t")[0],
+              games: [],
+            };
+          } else if (currentTournament && row.innerText.trim()) {
+            const gameData = row.innerText
+              .trim()
+              .split("\t")
+              ;
+            if (gameData.length > 7) {
+              const colorImg = row.querySelector("img");
+              const color = colorImg
+                ? colorImg.src.includes("wh")
+                  ? "w"
+                  : "b"
+                : null;
+
+              currentTournament.games.push({
+                opponentName: gameData[0],
+                opponentElo: gameData[3],
+                result: gameData[5],
+                kChange: gameData[9],
+                color: color,
+              });
+            }
+          }
+        });
+
+        if (currentTournament) {
+          tournaments.push(currentTournament);
+        }
+
+        return tournaments;
+      });
+      
+      tournaments_result[i - 1] = tournaments;
+    }
+  }
+
+  await browser.close();
+  return tournaments_result;
 }
 
-
+// scrapeFideData("651097982", "2022-11-01", "0");
 
 module.exports = { scrapePlayerInfo, getPlayerEloList, scrapeFideData };
