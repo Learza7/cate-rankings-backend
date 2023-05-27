@@ -75,7 +75,7 @@ async function scrapeFideData(id, period) {
 
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle2" });
+  await page.goto(url, { waitUntil: "networkidle0" });
 
   const period_result = await page.evaluate(() => {
     const periodRow = Array.from(
@@ -148,15 +148,47 @@ async function scrapeFideData(id, period) {
 
         return tournaments;
       });
-      
+
       tournaments_result[i - 1] = tournaments;
     }
   }
 
   await browser.close();
-  return tournaments_result;
+  
+  return {
+    period: period_result[0].text,
+    data: tournaments_result,
+  }
 }
+
+async function getPlayerLastElo(fide_id) {
+  const url = `https://ratings.fide.com/profile/${fide_id}/chart`;
+
+  try {
+    const { data } = await axios.get(url);
+    const $ = cheerio.load(data);
+
+    
+    const firstRow = $(".profile-table_chart-table tbody tr").first();
+    const period = firstRow.find("td").eq(0).text().trim();
+    const classical = firstRow.find("td").eq(1).text().trim();
+    const rapid = firstRow.find("td").eq(3).text().trim();
+    const blitz = firstRow.find("td").eq(5).text().trim();
+
+    return {
+      period,
+      classical,
+      rapid,
+      blitz,
+    };
+
+    
+  } catch (error) {
+    console.error(`Failed to scrape data from ${url}: `, error);
+  }
+}
+
 
 // scrapeFideData("651097982", "2022-11-01", "0");
 
-module.exports = { scrapePlayerInfo, getPlayerEloList, scrapeFideData };
+module.exports = { scrapePlayerInfo, getPlayerEloList, scrapeFideData, getPlayerLastElo };
