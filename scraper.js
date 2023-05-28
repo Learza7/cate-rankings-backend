@@ -13,8 +13,15 @@ async function scrapePlayerInfo(fide_id) {
     // First Name and Last Name
     let fullName = $(".profile-top-title").first().text().trim();
     let nameParts = fullName.split(",");
-    res.firstName = nameParts[1].trim();
-    res.lastName = nameParts[0].trim();
+    if (nameParts.length !== 2) {
+      res.firstName = fullName.split(" ")[0].trim();
+      res.lastName = fullName.split(" ")[2].trim();
+    }
+    else {
+      res.firstName = nameParts[1].trim();
+      res.lastName = nameParts[0].trim();
+    }
+
 
     // Sex
     let sexElement = $(
@@ -154,7 +161,7 @@ async function scrapeFideData(id, period) {
   }
 
   await browser.close();
-  
+
   return {
     period: period_result[0].text,
     data: tournaments_result,
@@ -168,7 +175,7 @@ async function getPlayerLastElo(fide_id) {
     const { data } = await axios.get(url);
     const $ = cheerio.load(data);
 
-    
+
     const firstRow = $(".profile-table_chart-table tbody tr").first();
     const period = firstRow.find("td").eq(0).text().trim();
     const classical = firstRow.find("td").eq(1).text().trim();
@@ -182,7 +189,7 @@ async function getPlayerLastElo(fide_id) {
       blitz,
     };
 
-    
+
   } catch (error) {
     console.error(`Failed to scrape data from ${url}: `, error);
   }
