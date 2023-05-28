@@ -55,17 +55,28 @@ app.get("/players", async (req, res) => {
 
     const playersWithLastElo = await Promise.all(players.map(async player => {
       // Get the latest elo for the player
-      const lastEloData = await prisma.elo.findFirst({
+      const firstTwoElos = await prisma.elo.findMany({
         where: { playerId: player.fideId },
-        orderBy: { date: 'desc' }
+        orderBy: { date: 'desc' },
+        take: 2
       });
 
       // Exclude the original elos from the player object
       //const { elos, ...playerData } = player;
 
-      const { id, ...lastElo } = lastEloData || {};
+      const {
+        date,
+        classical,
+        rapid,
+        blitz,
+      } = firstTwoElos[0] || {};
+
+      const classicalVariation = firstTwoElos[0].classical - firstTwoElos[1].classical;
+      const rapidVariation = firstTwoElos[0].rapid - firstTwoElos[1].rapid;
+      const blitzVariation = firstTwoElos[0].blitz - firstTwoElos[1].blitz;
+
       // Return player data with the latest elo
-      return { ...player, lastElo };
+      return { ...player, date, classical, rapid, blitz, classicalVariation, rapidVariation, blitzVariation };
     }));
 
     res.json(playersWithLastElo);
@@ -248,7 +259,7 @@ app.get("/elos", (req, res) => {
   res.send("Welcome to the Elos endpoint!");
 });
 
-app.get("/elos/updateAll", async  (req, res) => {
+app.get("/elos/updateAll", async (req, res) => {
   logger.info("Updating all elos");
   const players = await prisma.player.findMany();
   for (let i = 0; i < players.length; i++) {
@@ -385,8 +396,80 @@ app.get("/players/:id/tournaments", async (req, res) => {
     },
   });
   return res.json(tournaments);
-  
+
 });
 
+app.get("/init", async (req, res) => {
+  const members = JSON.parse(`{"members":[{"name":"Abolmaali Kayvan","origin":"IRN","FIDE_ID":"668761","birth_date":""},{"name":"Benlahrache Mohamed","totem":"owl","origin":"DZA","FIDE_ID":"652006522","birth_date":""},{"name":"Bouchez Guillaume","totem":"robot","origin":"FRA","FIDE_ID":"551003970","birth_date":""},{"name":"Boukeffa Nassim","origin":"DZA","FIDE_ID":"652038653","birth_date":""},{"name":"Bouychou Armand","totem":"ogre","origin":"FRA","FIDE_ID":"551004020","birth_date":""},{"name":"Calas-Aguilar Luken","totem":"horse","origin":"FRA","FIDE_ID":"652013952","birth_date":""},{"name":"Chernikova Iryna","totem":"spider","origin":"UKR","FIDE_ID":"36085243","birth_date":""},{"name":"Coelho Laurent","totem":"skunk","origin":"FRA","FIDE_ID":"45104840","birth_date":""},{"name":"Dabrowski Rémi","totem":"bull","origin":"POL","FIDE_ID":"651097982","birth_date":"2002-06-24"},{"name":"Fabre David","totem":"boar","origin":"FRA","FIDE_ID":"651079712","birth_date":""},{"name":"Fanon Frédéric","origin":"FRA","FIDE_ID":"551060817","birth_date":""},{"name":"Fargues Stéphanie","origin":"FRA","FIDE_ID":"26036657","birth_date":""},{"name":"Kennedy John","origin":"GBR","FIDE_ID":"45117721","birth_date":""},{"name":"Krause Max","totem":"wolf","origin":"GER","FIDE_ID":"4663640","birth_date":""},{"name":"Lestrohan Pierre","totem":"lobster","origin":"RUS","FIDE_ID":"34177563","birth_date":""},{"name":"Macqueron Grégory","totem":"panda","origin":"POL","FIDE_ID":"551004240","birth_date":"1976-01-15"},{"name":"Malinowski Christophe","totem":"lynx","origin":"POL","FIDE_ID":"652014010","birth_date":""},{"name":"Morata Jules","totem":"devil","origin":"FRA","FIDE_ID":"26094851","birth_date":"2000-03-20"},{"name":"Moreux Vincent","origin":"FRA","FIDE_ID":"652014525","birth_date":""},{"name":"Morin Min","origin":"CHN","FIDE_ID":"651021781","birth_date":""},{"name":"Perroux Jacques","origin":"FRA","FIDE_ID":"26004402","birth_date":""},{"name":"Petrowitsch Ruediger","totem":"raptor","origin":"GER","FIDE_ID":"36003174","birth_date":""},{"name":"Pochet Frédéric","totem":"dog","origin":"FRA","FIDE_ID":"651051150","birth_date":""},{"name":"Rich Philippe","totem":"bear","origin":"FRA","FIDE_ID":"661643","birth_date":""},{"name":"Reverdy Micah","totem":"cow","origin":"ESP","FIDE_ID":"24558869","birth_date":""},{"name":"Sarath","totem":"angel","origin":"IND","FIDE_ID":"25008846","birth_date":""},{"name":"Schoettler Mike","totem":"fox","origin":"GER","FIDE_ID":"45141274","birth_date":""},{"name":"Sena Ferreira Raul","totem":"chicken","origin":"BRA","FIDE_ID":"651087162","birth_date":""},{"name":"Toscani Jean-Patrick","totem":"snail","origin":"FRA","FIDE_ID":"26004518","birth_date":""},{"name":"Tsihlas Alexandre","origin":"GRC","FIDE_ID":"26060728","birth_date":""},{"name":"Viaud Thierry","totem":"crocodile","origin":"FRA","FIDE_ID":"20609973","birth_date":""},{"name":"Levacic Melissa","origin":"POL","FIDE_ID":"633747","birth_date":""},{"name":"Castellet-Menchon Didac","origin":"ESP","FIDE_ID":"22220410","birth_date":""},{"name":"Di Cerbo Ciro","origin":"FRA","FIDE_ID":"26084511","birth_date":""},{"name":"Wiggenhauser Amy","origin":"FRA","FIDE_ID":"653020570","birth_date":""},{"name":"Toulouze Pierre","origin":"FRA","FIDE_ID":"653006453","birth_date":""},{"name":"Tachot Christophe","origin":"FRA","FIDE_ID":"652064972","birth_date":""},{"name":"Soler Cédric","origin":"FRA","FIDE_ID":"653027760","birth_date":""},{"name":"Madiès Léo","origin":"FRA","FIDE_ID":"653027701","birth_date":""},{"name":"Mouillé André","origin":"FRA","FIDE_ID":"653086562","birth_date":""}]}`)
+  console.log(members.members);
+  for (let i = 0; i < members.members.length; i++) {
+    const member = members.members[i];
+    const fideId = member.FIDE_ID;
+    const playerInfo = await scrapePlayerInfo(fideId);
+    logger.info(fideId)
+    try {
+      const player = await prisma.player.create({
+        data: {
+          fideId: parseInt(fideId),
+          firstName: playerInfo.firstName,
+          lastName: playerInfo.lastName,
+          federation: playerInfo.federation,
+          birthYear: parseInt(playerInfo.birthYear),
+          sex: playerInfo.sex,
+        },
+      });
 
+      res.status(201).json(player);
+    } catch (error) {
+      // if (error.code === "P2002" && error.meta.target.includes("fideId")) {
+      //   res
+      //     .status(409)
+      //     .json({ error: "A player with this FIDE ID already exists" });
+      // } else {
+      //   console.log(error);
+      //   res
+      //     .status(500)
+      //     .json({ error: "An error occurred while creating the player" });
+      // }
+    }
+    const eloInfo = await getPlayerEloList(fideId);
+
+
+    console.log(eloInfo);
+
+    // create elo records
+    for (eloElem of eloInfo) {
+      // Convert date to consistent format
+      const eloDate = convertToDate(eloElem.period);
+
+      // Check if ELO with the same date exists for the player
+      const existingElo = await prisma.elo.findFirst({
+        where: {
+          AND: [
+            { date: eloDate },
+            { player: { fideId: parseInt(fideId) } }
+          ]
+        }
+      });
+
+      // Only create new ELO if it doesn't exist
+      if (!existingElo) {
+        const elo = await prisma.elo.create({
+          data: {
+            player: {
+              connect: {
+                fideId: parseInt(fideId),
+              },
+            },
+            date: eloDate,
+            classical: parseInt(eloElem.classical) ? parseInt(eloElem.classical) : null,
+            rapid: parseInt(eloElem.rapid) ? parseInt(eloElem.rapid) : null,
+            blitz: parseInt(eloElem.blitz) ? parseInt(eloElem.blitz) : null,
+          },
+        });
+      }
+    }
+
+  }
+});
 app.listen(3000, () => console.log("Server is running on port 3000"));
