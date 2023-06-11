@@ -49,6 +49,10 @@ app.use(cors());
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to CATE RANKINGS API" });
+});
+
 app.get("/players", async (req, res) => {
   try {
     const players = await prisma.player.findMany();
