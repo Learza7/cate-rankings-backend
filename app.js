@@ -50,7 +50,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to CATE RANKINGS API" });
+  res.json({ message: "Welcome to CATE RANKINGS" });
 });
 
 app.get("/players", async (req, res) => {
@@ -477,10 +477,8 @@ app.get("/init", async (req, res) => {
   }
 });
 
+app.listen(process.env.PORT, () => console.log("Server is running on port 3000"));
 
-if (process.env.VERCEL_ENV === "development") {
-  app.listen(3000, () => console.log("Server is running on port 3000"));
-  };
 
 module.exports = app;
 
