@@ -92,7 +92,7 @@ async function scrapeFideData(id, period) {
     const tds = Array.from(periodRow.querySelectorAll("td"));
     return tds.map((td) => {
       const anchor = td.querySelector("a");
-      if (anchor) {
+      if (anchor && anchor.innerText != "Available") {
         return {
           text: anchor.innerText,
           href: anchor.href,
