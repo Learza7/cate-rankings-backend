@@ -181,7 +181,7 @@ app.get("/players/:id", async (req, res) => {
 app.get("/games/updateAll", async (req, res) => {
   const players = await prisma.player.findMany();
 
-
+  res.json({ message: "Updating all games" });
 
   for (let i = 0; i < players.length; i++) {
     let id = players[i].fideId;
@@ -258,7 +258,7 @@ app.get("/games/updateAll", async (req, res) => {
 
 
   }
-  return res.json({ message: "ok" });
+  // return res.json({ message: "ok" });
 
 });
 
