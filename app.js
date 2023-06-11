@@ -482,11 +482,11 @@ app.get("/init", async (req, res) => {
 
 app.listen(process.env.PORT, () => console.log("Server is running on port 3000"));
 
-const http = require('http');
+// const http = require('http');
 
-setInterval(() => {
-  http.get("http://cate-rankings-backend.herokuapp.com/");
-}, 25 * 60 * 1000); // every 25 minutes
+// setInterval(() => {
+//   http.get("http://cate-rankings-backend.herokuapp.com/");
+// }, 25 * 60 * 1000); // every 25 minutes
 
 module.exports = app;
 
