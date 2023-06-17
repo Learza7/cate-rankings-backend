@@ -392,10 +392,33 @@ app.post("/players", async (req, res) => {
 app.get("/players/:id/tournaments", async (req, res) => {
   const { id } = req.params;
 
+  const latestTournamentDate = await prisma.tournament.findFirst({
+    where: {
+      // player: {
+      //   fideId: parseInt(id),
+      // },
+    },
+    orderBy: {
+      date: 'desc',
+    },
+    select: {
+      date: true,
+    },
+  });
+
+  const lastMonthStartDate = new Date(latestTournamentDate.date);
+  console.log(lastMonthStartDate);
+  // lastMonthStartDate.setMonth(lastMonthStartDate.getMonth() - 1);
+  // lastMonthStartDate.setDate(1);
+  // lastMonthStartDate.setHours(0, 0, 0, 0);
+
   const tournaments = await prisma.tournament.findMany({
     where: {
       player: {
         fideId: parseInt(id),
+      },
+      date: {
+        gte: lastMonthStartDate.toISOString(),
       },
     },
     include: {
@@ -403,14 +426,12 @@ app.get("/players/:id/tournaments", async (req, res) => {
     },
   });
 
-  // Crée un objet pour regrouper les tournois par timeControl
   const groupedTournaments = {
     classical: [],
     rapid: [],
     blitz: [],
   };
 
-  // Parcours les tournois et ajoute-les à l'objet approprié
   tournaments.forEach(tournament => {
     switch(tournament.timeControl) {
       case 'classical':
@@ -425,11 +446,11 @@ app.get("/players/:id/tournaments", async (req, res) => {
     }
   });
 
-  // Transforme l'objet en un tableau de tableaux
   const responseArray = Object.values(groupedTournaments);
 
   return res.json(responseArray);
 });
+
 
 
 app.get("/init", async (req, res) => {
