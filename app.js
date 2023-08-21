@@ -433,7 +433,7 @@ app.get("/players/:id/tournaments", async (req, res) => {
   };
 
   tournaments.forEach(tournament => {
-    switch(tournament.timeControl) {
+    switch (tournament.timeControl) {
       case 'classical':
         groupedTournaments.classical.push(tournament);
         break;
@@ -450,6 +450,51 @@ app.get("/players/:id/tournaments", async (req, res) => {
 
   return res.json(responseArray);
 });
+
+app.get("/transfer/:username", async (req, res) => {
+
+  const { username } = req.params;
+
+  const date = new Date();
+
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+  let response = await fetch(`https://api.chess.com/pub/player/${username}/games/${year}/${month}`)
+  let data = await response.json();
+
+  console.log(data)
+
+  if (data.code == 0) {
+    return res.json({
+      error: `No games found for ${username} for the month of ${month}/${year}`
+    })
+  }
+
+  let games = data.games;
+
+  let lastGame = games[games.length - 1];
+
+  let pgn = lastGame.pgn;
+
+  let formData = new URLSearchParams();
+  formData.append('pgn', pgn);
+
+  let response_lichess = await fetch(`https://lichess.org/api/import`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  let data_lichess = await response_lichess;
+
+  let url = data_lichess.url;
+
+  return res.json({
+    url: url,
+    ...lastGame,
+  })
+});
+
 
 
 
