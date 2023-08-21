@@ -458,20 +458,20 @@ app.get("/transfer/:username", async (req, res) => {
   const date = new Date();
 
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const month = date.getMonth().toString().padStart(2, '0');
 
   let response = await fetch(`https://api.chess.com/pub/player/${username}/games/${year}/${month}`)
   let data = await response.json();
 
-  console.log(data)
+  // console.log(data)
 
-  if (data.code == 0) {
+  let games = data.games;
+
+  if (data.code == 0 || games.length == 0) {
     return res.json({
       error: `No games found for ${username} for the month of ${month}/${year}`
     })
   }
-
-  let games = data.games;
 
   let lastGame = games[games.length - 1];
 
@@ -489,8 +489,10 @@ app.get("/transfer/:username", async (req, res) => {
 
   let url = data_lichess.url;
 
+  console.log(url);
+
   return res.json({
-    url: url,
+    lichess_url: url,
     ...lastGame,
   })
 });
