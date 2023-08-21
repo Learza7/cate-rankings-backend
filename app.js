@@ -499,7 +499,299 @@ app.get("/transfer/:username", async (req, res) => {
 
 
 app.get("/init", async (req, res) => {
-  const members = JSON.parse(`{"members":[{"name":"Abolmaali Kayvan","origin":"IRN","FIDE_ID":"668761","birth_date":""},{"name":"Benlahrache Mohamed","totem":"owl","origin":"DZA","FIDE_ID":"652006522","birth_date":""},{"name":"Bouchez Guillaume","totem":"robot","origin":"FRA","FIDE_ID":"551003970","birth_date":""},{"name":"Boukeffa Nassim","origin":"DZA","FIDE_ID":"652038653","birth_date":""},{"name":"Bouychou Armand","totem":"ogre","origin":"FRA","FIDE_ID":"551004020","birth_date":""},{"name":"Calas-Aguilar Luken","totem":"horse","origin":"FRA","FIDE_ID":"652013952","birth_date":""},{"name":"Chernikova Iryna","totem":"spider","origin":"UKR","FIDE_ID":"36085243","birth_date":""},{"name":"Coelho Laurent","totem":"skunk","origin":"FRA","FIDE_ID":"45104840","birth_date":""},{"name":"Dabrowski Rémi","totem":"bull","origin":"POL","FIDE_ID":"651097982","birth_date":"2002-06-24"},{"name":"Fabre David","totem":"boar","origin":"FRA","FIDE_ID":"651079712","birth_date":""},{"name":"Fanon Frédéric","origin":"FRA","FIDE_ID":"551060817","birth_date":""},{"name":"Fargues Stéphanie","origin":"FRA","FIDE_ID":"26036657","birth_date":""},{"name":"Kennedy John","origin":"GBR","FIDE_ID":"45117721","birth_date":""},{"name":"Krause Max","totem":"wolf","origin":"GER","FIDE_ID":"4663640","birth_date":""},{"name":"Lestrohan Pierre","totem":"lobster","origin":"RUS","FIDE_ID":"34177563","birth_date":""},{"name":"Macqueron Grégory","totem":"panda","origin":"POL","FIDE_ID":"551004240","birth_date":"1976-01-15"},{"name":"Malinowski Christophe","totem":"lynx","origin":"POL","FIDE_ID":"652014010","birth_date":""},{"name":"Morata Jules","totem":"devil","origin":"FRA","FIDE_ID":"26094851","birth_date":"2000-03-20"},{"name":"Moreux Vincent","origin":"FRA","FIDE_ID":"652014525","birth_date":""},{"name":"Morin Min","origin":"CHN","FIDE_ID":"651021781","birth_date":""},{"name":"Perroux Jacques","origin":"FRA","FIDE_ID":"26004402","birth_date":""},{"name":"Petrowitsch Ruediger","totem":"raptor","origin":"GER","FIDE_ID":"36003174","birth_date":""},{"name":"Pochet Frédéric","totem":"dog","origin":"FRA","FIDE_ID":"651051150","birth_date":""},{"name":"Rich Philippe","totem":"bear","origin":"FRA","FIDE_ID":"661643","birth_date":""},{"name":"Reverdy Micah","totem":"cow","origin":"ESP","FIDE_ID":"24558869","birth_date":""},{"name":"Sarath","totem":"angel","origin":"IND","FIDE_ID":"25008846","birth_date":""},{"name":"Schoettler Mike","totem":"fox","origin":"GER","FIDE_ID":"45141274","birth_date":""},{"name":"Sena Ferreira Raul","totem":"chicken","origin":"BRA","FIDE_ID":"651087162","birth_date":""},{"name":"Toscani Jean-Patrick","totem":"snail","origin":"FRA","FIDE_ID":"26004518","birth_date":""},{"name":"Tsihlas Alexandre","origin":"GRC","FIDE_ID":"26060728","birth_date":""},{"name":"Viaud Thierry","totem":"crocodile","origin":"FRA","FIDE_ID":"20609973","birth_date":""},{"name":"Levacic Melissa","origin":"POL","FIDE_ID":"633747","birth_date":""},{"name":"Castellet-Menchon Didac","origin":"ESP","FIDE_ID":"22220410","birth_date":""},{"name":"Di Cerbo Ciro","origin":"FRA","FIDE_ID":"26084511","birth_date":""},{"name":"Wiggenhauser Amy","origin":"FRA","FIDE_ID":"653020570","birth_date":""},{"name":"Toulouze Pierre","origin":"FRA","FIDE_ID":"653006453","birth_date":""},{"name":"Tachot Christophe","origin":"FRA","FIDE_ID":"652064972","birth_date":""},{"name":"Soler Cédric","origin":"FRA","FIDE_ID":"653027760","birth_date":""},{"name":"Madiès Léo","origin":"FRA","FIDE_ID":"653027701","birth_date":""},{"name":"Mouillé André","origin":"FRA","FIDE_ID":"653086562","birth_date":""}]}`)
+  const members = JSON.parse(`{
+  "members": [
+    {
+      "name": "Abolmaali Kayvan",
+      "origin": "IRN",
+      "FIDE_ID": "668761",
+      "birth_date": ""
+    },
+    {
+      "name": "Benlahrache Mohamed",
+      "totem": "owl",
+      "origin": "DZA",
+      "FIDE_ID": "652006522",
+      "birth_date": ""
+    },
+    {
+      "name": "Bouchez Guillaume",
+      "totem": "robot",
+      "origin": "FRA",
+      "FIDE_ID": "551003970",
+      "birth_date": ""
+    },
+    {
+      "name": "Boukeffa Nassim",
+      "origin": "DZA",
+      "FIDE_ID": "652038653",
+      "birth_date": ""
+    },
+    {
+      "name": "Bouychou Armand",
+      "totem": "ogre",
+      "origin": "FRA",
+      "FIDE_ID": "551004020",
+      "birth_date": ""
+    },
+    {
+      "name": "Calas-Aguilar Luken",
+      "totem": "horse",
+      "origin": "FRA",
+      "FIDE_ID": "652013952",
+      "birth_date": ""
+    },
+    {
+      "name": "Chernikova Iryna",
+      "totem": "spider",
+      "origin": "UKR",
+      "FIDE_ID": "36085243",
+      "birth_date": ""
+    },
+    {
+      "name": "Coelho Laurent",
+      "totem": "skunk",
+      "origin": "FRA",
+      "FIDE_ID": "45104840",
+      "birth_date": ""
+    },
+    {
+      "name": "Dabrowski Rémi",
+      "totem": "bull",
+      "origin": "POL",
+      "FIDE_ID": "651097982",
+      "birth_date": "2002-06-24"
+    },
+    {
+      "name": "Fabre David",
+      "totem": "boar",
+      "origin": "FRA",
+      "FIDE_ID": "651079712",
+      "birth_date": ""
+    },
+    {
+      "name": "Fanon Frédéric",
+      "origin": "FRA",
+      "FIDE_ID": "551060817",
+      "birth_date": ""
+    },
+    {
+      "name": "Fargues Stéphanie",
+      "origin": "FRA",
+      "FIDE_ID": "26036657",
+      "birth_date": ""
+    },
+    {
+      "name": "Kennedy John",
+      "origin": "GBR",
+      "FIDE_ID": "45117721",
+      "birth_date": ""
+    },
+    {
+      "name": "Krause Max",
+      "totem": "wolf",
+      "origin": "GER",
+      "FIDE_ID": "4663640",
+      "birth_date": ""
+    },
+    {
+      "name": "Lestrohan Pierre",
+      "totem": "lobster",
+      "origin": "RUS",
+      "FIDE_ID": "34177563",
+      "birth_date": ""
+    },
+    {
+      "name": "Macqueron Grégory",
+      "totem": "panda",
+      "origin": "POL",
+      "FIDE_ID": "551004240",
+      "birth_date": "1976-01-15"
+    },
+    {
+      "name": "Malinowski Christophe",
+      "totem": "lynx",
+      "origin": "POL",
+      "FIDE_ID": "652014010",
+      "birth_date": ""
+    },
+    {
+      "name": "Morata Jules",
+      "totem": "devil",
+      "origin": "FRA",
+      "FIDE_ID": "26094851",
+      "birth_date": "2000-03-20"
+    },
+    {
+      "name": "Moreux Vincent",
+      "origin": "FRA",
+      "FIDE_ID": "652014525",
+      "birth_date": ""
+    },
+    {
+      "name": "Morin Min",
+      "origin": "CHN",
+      "FIDE_ID": "651021781",
+      "birth_date": ""
+    },
+    {
+      "name": "Perroux Jacques",
+      "origin": "FRA",
+      "FIDE_ID": "26004402",
+      "birth_date": ""
+    },
+    {
+      "name": "Petrowitsch Ruediger",
+      "totem": "raptor",
+      "origin": "GER",
+      "FIDE_ID": "36003174",
+      "birth_date": ""
+    },
+    {
+      "name": "Pochet Frédéric",
+      "totem": "dog",
+      "origin": "FRA",
+      "FIDE_ID": "651051150",
+      "birth_date": ""
+    },
+    {
+      "name": "Rich Philippe",
+      "totem": "bear",
+      "origin": "FRA",
+      "FIDE_ID": "661643",
+      "birth_date": ""
+    },
+    {
+      "name": "Reverdy Micah",
+      "totem": "cow",
+      "origin": "ESP",
+      "FIDE_ID": "24558869",
+      "birth_date": ""
+    },
+    {
+      "name": "Sarath",
+      "totem": "angel",
+      "origin": "IND",
+      "FIDE_ID": "25008846",
+      "birth_date": ""
+    },
+    {
+      "name": "Schoettler Mike",
+      "totem": "fox",
+      "origin": "GER",
+      "FIDE_ID": "45141274",
+      "birth_date": ""
+    },
+    {
+      "name": "Sena Ferreira Raul",
+      "totem": "chicken",
+      "origin": "BRA",
+      "FIDE_ID": "651087162",
+      "birth_date": ""
+    },
+    {
+      "name": "Toscani Jean-Patrick",
+      "totem": "snail",
+      "origin": "FRA",
+      "FIDE_ID": "26004518",
+      "birth_date": ""
+    },
+    {
+      "name": "Tsihlas Alexandre",
+      "origin": "GRC",
+      "FIDE_ID": "26060728",
+      "birth_date": ""
+    },
+    {
+      "name": "Viaud Thierry",
+      "totem": "crocodile",
+      "origin": "FRA",
+      "FIDE_ID": "20609973",
+      "birth_date": ""
+    },
+    {
+      "name": "Levacic Melissa",
+      "origin": "POL",
+      "FIDE_ID": "633747",
+      "birth_date": ""
+    },
+    {
+      "name": "Castellet-Menchon Didac",
+      "origin": "ESP",
+      "FIDE_ID": "22220410",
+      "birth_date": ""
+    },
+    {
+      "name": "Di Cerbo Ciro",
+      "origin": "FRA",
+      "FIDE_ID": "26084511",
+      "birth_date": ""
+    },
+    {
+      "name": "Wiggenhauser Amy",
+      "origin": "FRA",
+      "FIDE_ID": "653020570",
+      "birth_date": ""
+    },
+    {
+      "name": "Toulouze Pierre",
+      "origin": "FRA",
+      "FIDE_ID": "653006453",
+      "birth_date": ""
+    },
+    {
+      "name": "Tachot Christophe",
+      "origin": "FRA",
+      "FIDE_ID": "652064972",
+      "birth_date": ""
+    },
+    {
+      "name": "Soler Cédric",
+      "origin": "FRA",
+      "FIDE_ID": "653027760",
+      "birth_date": ""
+    },
+    {
+      "name": "Madiès Léo",
+      "origin": "FRA",
+      "FIDE_ID": "653027701",
+      "birth_date": ""
+    },
+    {
+      "name": "Mouillé André",
+      "origin": "FRA",
+      "FIDE_ID": "653086562",
+      "birth_date": ""
+    },
+    {
+      "name": "Stangl Anita",
+      "origin": "DE",
+      "FIDE_ID": "4608801",
+      "birth_date": ""
+    },
+    {
+      "name": "Kraba Hamou",
+      "origin": "FRA",
+      "FIDE_ID": "653094697",
+      "birth_date": ""
+    },
+    
+    {
+      "name": "Gambardella Eddie",
+      "origin": "FRA",
+      "FIDE_ID": "653017498",
+      "birth_date": ""
+    },
+    {
+      "name": "Damasceno Taina",
+      "origin": "FRA",
+      "FIDE_ID": "652031802",
+      "birth_date": ""
+    }
+    
+    
+  ]
+}`)
   console.log(members.members);
   for (let i = 0; i < members.members.length; i++) {
     const member = members.members[i];
