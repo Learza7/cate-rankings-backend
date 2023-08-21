@@ -473,7 +473,7 @@ app.get("/transfer/:username", async (req, res) => {
     })
   }
 
-  let lastGame = games[games.length - 1];
+  let lastGame = games[0];
 
   let pgn = lastGame.pgn;
 
