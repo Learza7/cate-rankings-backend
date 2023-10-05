@@ -789,6 +789,30 @@ app.get("/init", async (req, res) => {
       "origin": "FRA",
       "FIDE_ID": "652031802",
       "birth_date": ""
+    },
+    {
+      "name": "Luminais Eric",
+      "origin": "FRA",
+      "FIDE_ID": "610372",
+      "birth_date": ""
+    },
+    {
+    "name": "Mohtaji Javad",
+      "origin": "FRA",
+      "FIDE_ID": "617229",
+      "birth_date": ""
+    },
+    {
+      "name": "Viné Thibaut",
+      "origin": "FRA",
+      "FIDE_ID": "20654227",
+      "birth_date": ""
+    },
+    {
+      "name": "Erhart François-Xavier",
+      "origin": "FRA",
+      "FIDE_ID": "20663099",
+      "birth_date": ""
     }
     
     
