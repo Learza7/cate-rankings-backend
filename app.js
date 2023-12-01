@@ -813,6 +813,12 @@ app.get("/init", async (req, res) => {
       "origin": "FRA",
       "FIDE_ID": "20663099",
       "birth_date": ""
+    },
+    {
+      "name": "Santos Marvin",
+      "origin": "FRA",
+      "FIDE_ID": "80453155",
+      "birth_date": ""
     }
     
     
