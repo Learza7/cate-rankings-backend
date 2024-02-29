@@ -828,6 +828,18 @@ app.get("/init", async (req, res) => {
   for (let i = 0; i < members.members.length; i++) {
     const member = members.members[i];
     const fideId = member.FIDE_ID;
+
+    // if member arelady in db, skip
+    const existingPlayer = await prisma.player.findFirst({
+      where: {
+        fideId: parseInt(fideId),
+      },
+    });
+
+    if (existingPlayer) {
+      continue;
+    }
+
     const playerInfo = await scrapePlayerInfo(fideId);
     logger.info(fideId)
     try {
