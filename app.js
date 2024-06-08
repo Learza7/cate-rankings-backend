@@ -57,7 +57,7 @@ app.get("/players", async (req, res) => {
   logger.info("Endpoint /players called. Calling prisma...")
   try {
     const players = await prisma.player.findMany();
-
+    return players;
     logger.info("Prisma returned " + players.length + " players");
 
     const playersWithLastElo = await Promise.all(players.map(async player => {
