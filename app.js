@@ -57,36 +57,36 @@ app.get("/players", async (req, res) => {
   logger.info("Endpoint /players called. Calling prisma...")
   try {
     const players = await prisma.player.findMany();
-    return players;
+    
     logger.info("Prisma returned " + players.length + " players");
+    res.json(players);
+    // const playersWithLastElo = await Promise.all(players.map(async player => {
+    //   // Get the latest elo for the player
+    //   const firstTwoElos = await prisma.elo.findMany({
+    //     where: { playerId: player.fideId },
+    //     orderBy: { date: 'desc' },
+    //     take: 2
+    //   });
 
-    const playersWithLastElo = await Promise.all(players.map(async player => {
-      // Get the latest elo for the player
-      const firstTwoElos = await prisma.elo.findMany({
-        where: { playerId: player.fideId },
-        orderBy: { date: 'desc' },
-        take: 2
-      });
+    //   // Exclude the original elos from the player object
+    //   //const { elos, ...playerData } = player;
 
-      // Exclude the original elos from the player object
-      //const { elos, ...playerData } = player;
+    //   const {
+    //     date,
+    //     classical,
+    //     rapid,
+    //     blitz,
+    //   } = firstTwoElos[0] || {};
 
-      const {
-        date,
-        classical,
-        rapid,
-        blitz,
-      } = firstTwoElos[0] || {};
+    //   const classicalVariation = firstTwoElos[0].classical - firstTwoElos[1].classical;
+    //   const rapidVariation = firstTwoElos[0].rapid - firstTwoElos[1].rapid;
+    //   const blitzVariation = firstTwoElos[0].blitz - firstTwoElos[1].blitz;
 
-      const classicalVariation = firstTwoElos[0].classical - firstTwoElos[1].classical;
-      const rapidVariation = firstTwoElos[0].rapid - firstTwoElos[1].rapid;
-      const blitzVariation = firstTwoElos[0].blitz - firstTwoElos[1].blitz;
+    //   // Return player data with the latest elo
+    //   return { ...player, date, classical, rapid, blitz, classicalVariation, rapidVariation, blitzVariation };
+    // }));
 
-      // Return player data with the latest elo
-      return { ...player, date, classical, rapid, blitz, classicalVariation, rapidVariation, blitzVariation };
-    }));
-
-    res.json(playersWithLastElo);
+    // res.json(playersWithLastElo);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "An error occurred while fetching the players" });
