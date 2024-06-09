@@ -59,7 +59,37 @@ app.get("/players", async (req, res) => {
     const players = await prisma.player.findMany();
     
     logger.info("Prisma returned " + players.length + " players");
-    res.json(players);
+
+    const playersWithLastElo = await Promise.all(players.map(async player => {
+
+      let req = await fetch(`https://ratings.fide.com/a_chart_data.phtml?event=${player.fideId}&period=0`, {
+        "headers": {
+          "accept": "*/*",
+          "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6",
+          "x-requested-with": "XMLHttpRequest",
+          "Referer": "https://ratings.fide.com/profile/651097982/chart",
+          "Referrer-Policy": "strict-origin-when-cross-origin"
+        },
+        "body": null,
+        "method": "POST"
+      });
+
+      let data = await req.json();
+
+      return {
+        ...player,
+        classical: data[-1]?.rating || 0,
+        rapid: data[-1]?.rapid_rtng || 0,
+        blitz: data[-1]?.blitz_rtng || 0,
+        classicalVariation: (data[-1]?.rating - data[-2]?.rating) || 0,
+        rapidVariation: (data[-1]?.rapid_rtng - data[-2]?.rapid_rtng) || 0,
+        blitzVariation: (data[-1]?.blitz_rtng - data[-2]?.blitz_rtng) || 0,
+    }}
+
+    ))
+
+
+    res.json(playersWithLastElo);
     // const playersWithLastElo = await Promise.all(players.map(async player => {
     //   // Get the latest elo for the player
     //   const firstTwoElos = await prisma.elo.findMany({
