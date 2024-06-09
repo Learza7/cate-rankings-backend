@@ -81,9 +81,9 @@ app.get("/players", async (req, res) => {
     classical: data[data.length - 1]?.rating || null,
     rapid: data[data.length - 1]?.rapid_rtng || null,
     blitz: data[data.length - 1]?.blitz_rtng || null,
-    classicalVariation: (data[data.length - 1]?.rating - data[data.length - 2]?.rating) || null,
-    rapidVariation: (data[data.length - 1]?.rapid_rtng - data[data.length - 2]?.rapid_rtng) || null,
-    blitzVariation: (data[data.length - 1]?.blitz_rtng - data[data.length - 2]?.blitz_rtng) || null,
+    classicalVariation: (data[data.length - 1]?.rating - data[data.length - 2]?.rating) || 0,
+    rapidVariation: (data[data.length - 1]?.rapid_rtng - data[data.length - 2]?.rapid_rtng) || 0,
+    blitzVariation: (data[data.length - 1]?.blitz_rtng - data[data.length - 2]?.blitz_rtng) || 0,
 }}
     ))
 
