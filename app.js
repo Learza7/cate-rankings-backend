@@ -20,27 +20,27 @@ const logger = winston.createLogger({
 
 
 const convertStringToDate = (dateString) => {
-  const [month, year] = dateString.split(' ');
+  const [year, month] = dateString.split('-');
   const monthMap = {
-    January: '01',
-    February: '02',
-    March: '03',
-    April: '04',
+    Jan: '01',
+    Feb: '02',
+    Mar: '03',
+    Apr: '04',
     May: '05',
-    June: '06',
-    July: '07',
-    August: '08',
-    September: '09',
-    October: '10',
-    November: '11',
-    December: '12'
+    Jun: '06',
+    Jul: '07',
+    Aug: '08',
+    Sep: '09',
+    Oct: '10',
+    Nov: '11',
+    Dec: '12',
   };
 
   const monthNumber = monthMap[month];
 
   const newDateString = `${year}-${monthNumber}-01`;
 
-  return new Date(newDateString);
+  return newDateString;
 }
 
 
@@ -76,6 +76,17 @@ app.get("/players", async (req, res) => {
 
       let data = await req.json();
 
+      const thisMonth = convertStringToDate(data[data.length - 1].date_2);
+
+      const tournaments = [0, 1, 2].map(async i => {
+        let q = await fetch(`https://ratings.fide.com/calculations.phtml?id_number=${player.fideId}&period=${thisMonth}&rating=${i}`);
+        //res content type is html
+        let text = await q.text();
+
+        return text;
+      })
+
+
     return {
     ...player,
     classical: data[data.length - 1]?.rating || null,
@@ -84,6 +95,7 @@ app.get("/players", async (req, res) => {
     classicalVariation: (data[data.length - 1]?.rating - data[data.length - 2]?.rating) || 0,
     rapidVariation: (data[data.length - 1]?.rapid_rtng - data[data.length - 2]?.rapid_rtng) || 0,
     blitzVariation: (data[data.length - 1]?.blitz_rtng - data[data.length - 2]?.blitz_rtng) || 0,
+    tournaments: tournaments,
 }}
     ))
 
