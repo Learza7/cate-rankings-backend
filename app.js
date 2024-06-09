@@ -81,7 +81,7 @@ app.get("/players", async (req, res) => {
 
 
       const tournaments = await Promise.all([0, 1, 2].map(async i => {
-        let q = await fetch(`https://ratings.fide.com/calculations.phtml?id_number=${player.fideId}&period=${thisMonth}&rating=${i}`);
+        let q = await fetch(`https://ratings.fide.com/a_indv_calculations.php?id_number=${player.fideId}&rating_period=${thisMonth}&t=${i}`);
         //res content type is html
         logger.info(q)
 
