@@ -78,13 +78,20 @@ app.get("/players", async (req, res) => {
 
       const thisMonth = convertStringToDate(data[data.length - 1].date_2);
 
-      const tournaments = [0, 1, 2].map(async i => {
+
+
+      const tournaments = await Promise.all([0, 1, 2].map(async i => {
         let q = await fetch(`https://ratings.fide.com/calculations.phtml?id_number=${player.fideId}&period=${thisMonth}&rating=${i}`);
         //res content type is html
+        logger.info(q)
+
+        
         let text = await q.text();
 
+        logger.info(text);
+
         return text;
-      })
+      }));
 
 
     return {
