@@ -76,16 +76,15 @@ app.get("/players", async (req, res) => {
 
       let data = await req.json();
 
-      return {
-        ...player,
-        classical: data[-1]?.rating || 0,
-        rapid: data[-1]?.rapid_rtng || 0,
-        blitz: data[-1]?.blitz_rtng || 0,
-        classicalVariation: (data[-1]?.rating - data[-2]?.rating) || 0,
-        rapidVariation: (data[-1]?.rapid_rtng - data[-2]?.rapid_rtng) || 0,
-        blitzVariation: (data[-1]?.blitz_rtng - data[-2]?.blitz_rtng) || 0,
-    }}
-
+    return {
+    ...player,
+    classical: data[data.length - 1]?.rating || 0,
+    rapid: data[data.length - 1]?.rapid_rtng || 0,
+    blitz: data[data.length - 1]?.blitz_rtng || 0,
+    classicalVariation: (data[data.length - 1]?.rating - data[data.length - 2]?.rating) || 0,
+    rapidVariation: (data[data.length - 1]?.rapid_rtng - data[data.length - 2]?.rapid_rtng) || 0,
+    blitzVariation: (data[data.length - 1]?.blitz_rtng - data[data.length - 2]?.blitz_rtng) || 0,
+}}
     ))
 
 
